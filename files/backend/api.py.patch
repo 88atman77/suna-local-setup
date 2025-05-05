@@ -1,0 +1,60 @@
+--- api.py.orig
++++ api.py
+@@ -15,6 +15,11 @@
+ @router.post("/run")
+ async def agent_run(request: Request, run_request: AgentRunRequest):
+     """Run an agent."""
++    # In LOCAL mode, bypass authentication
++    if config.ENV_MODE == EnvMode.LOCAL:
++        logger.info("LOCAL mode: Bypassing authentication")
++        user_id = "local-user-123"
++    else:
+     # Verify user token
+     token = request.headers.get("Authorization", "").replace("Bearer ", "")
+     user_id = await verify_user_token(token, db)
+@@ -30,6 +35,22 @@
+     return {"run_id": run_id}
+ 
+ 
++@router.post("/test_local_llm")
++async def test_local_llm():
++    """Test the local LLM endpoint."""
++    try:
++        from services.llm import make_llm_api_call
++        response = await make_llm_api_call(
++            model="local-mistral",
++            messages=[{"role": "user", "content": "Say hello world"}],
++            temperature=0.7,
++            max_tokens=100
++        )
++        return {"status": "success", "response": response}
++    except Exception as e:
++        return {"status": "error", "message": str(e)}
++
++
+ @router.get("/stream/{run_id}")
+ async def stream_agent_run(
+     request: Request,
+@@ -37,6 +58,11 @@
+     background_tasks: BackgroundTasks,
+ ):
+     """Stream an agent run."""
++    # In LOCAL mode, bypass authentication and database checks
++    if config.ENV_MODE == EnvMode.LOCAL:
++        logger.info("LOCAL mode: Bypassing authentication and database checks for streaming")
++        user_id = "local-user-123"
++    else:
+     # Verify user token
+     token = request.headers.get("Authorization", "").replace("Bearer ", "")
+     user_id = await verify_user_token(token, db)
+@@ -53,6 +79,10 @@
+ 
+ async def update_agent_run_status(run_id: str, status: str):
+     """Update the status of an agent run."""
++    # In LOCAL mode, skip database updates
++    if config.ENV_MODE == EnvMode.LOCAL:
++        logger.info(f"LOCAL mode: Skipping database update for agent run {run_id}")
++        return
+     client = await db.client
+     await client.table("agent_runs").update(
+         {"status": status, "updated_at": datetime.now().isoformat()}

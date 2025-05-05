@@ -1,0 +1,15 @@
+--- layout.tsx.orig
++++ layout.tsx
+@@ -10,6 +10,12 @@
+ export async function getServerSideProps() {
+   try {
+     const { data: healthData, error: healthError } = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/health`);
++    
++    // In LOCAL mode, bypass API health check
++    if (process.env.ENV_MODE === "LOCAL") {
++      console.log("LOCAL mode: Bypassing API health check");
++      return { props: {} };
++    }
+ 
+     if (healthError || !healthData) {
+       return {

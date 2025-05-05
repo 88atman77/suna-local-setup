@@ -1,0 +1,17 @@
+--- config.py.orig
++++ config.py
+@@ -10,10 +10,10 @@
+ 
+ @dataclass
+ class Config:
+-    OPENAI_API_KEY: str
+-    TAVILY_API_KEY: str
+-    SUPABASE_URL: str
+-    SUPABASE_KEY: str
++    OPENAI_API_KEY: Optional[str] = None
++    OPENAI_API_BASE: Optional[str] = None
++    TAVILY_API_KEY: Optional[str] = None
++    SUPABASE_URL: Optional[str] = None
++    SUPABASE_KEY: Optional[str] = None
+     REDIS_URL: Optional[str] = None
+     ENV_MODE: EnvMode = EnvMode.DEVELOPMENT

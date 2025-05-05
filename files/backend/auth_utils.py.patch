@@ -1,0 +1,14 @@
+--- auth_utils.py.orig
++++ auth_utils.py
+@@ -12,6 +12,11 @@
+ async def verify_user_token(token: str, db: DBConnection) -> str:
+     """Verify a user token and return the user ID."""
+     try:
++        # In LOCAL mode, bypass authentication
++        if config.ENV_MODE == EnvMode.LOCAL:
++            logger.info("LOCAL mode: Bypassing authentication")
++            return "local-user-123"
++            
+         client = await db.client
+         response = await client.auth.get_user(token)
+         user_id = response.user.id

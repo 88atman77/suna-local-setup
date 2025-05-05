@@ -1,0 +1,13 @@
+--- llm.py.orig
++++ llm.py
+@@ -12,7 +12,9 @@
+ 
+ async def make_llm_api_call(model: str, messages: List[Dict[str, Any]], **kwargs) -> str:
+     """Make an API call to the LLM."""
+-    openai.api_key = config.OPENAI_API_KEY
++    openai.api_key = config.OPENAI_API_KEY or "sk-dummy-key"
++    if config.OPENAI_API_BASE:
++        openai.api_base = config.OPENAI_API_BASE
+     
+     try:
+         response = await openai.ChatCompletion.acreate(

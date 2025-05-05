@@ -1,0 +1,46 @@
+--- thread_manager.py.orig
++++ thread_manager.py
+@@ -13,6 +13,8 @@
+ """
+ 
+ import json
++import uuid
++from datetime import datetime, timezone
+ from typing import List, Dict, Any, Optional, Type, Union, AsyncGenerator, Literal
+ from services.llm import make_llm_api_call
+ from agentpress.tool import Tool
+@@ -24,6 +26,7 @@
+ )
+ from services.supabase import DBConnection
+ from utils.logger import logger
++from utils.config import config, EnvMode
+ 
+ # Type alias for tool choice
+ ToolChoice = Literal["auto", "required", "none"]
+@@ -71,7 +74,29 @@
+                       Defaults to None, stored as an empty JSONB object if None.
+         """
+         logger.debug(f"Adding message of type '{type}' to thread {thread_id}")
++        
++        # In local mode, we'll use a mock message
++        if config.ENV_MODE == EnvMode.LOCAL:
++            logger.info(f"LOCAL mode: Creating mock message for thread {thread_id}")
++            message_id = str(uuid.uuid4())
++            created_at = datetime.now(timezone.utc).isoformat()
++            return {
++                'message_id': message_id,
++                'thread_id': thread_id,
++                'type': type,
++                'content': content,
++                'is_llm_message': is_llm_message,
++                'metadata': metadata or {},
++                'created_at': created_at
++            }
++        
+         client = await self.db.client
++        if client is None:
++            logger.warning(f"No database client available, creating mock message for thread {thread_id}")
++            message_id = str(uuid.uuid4())
++            created_at = datetime.now(timezone.utc).isoformat()
++            return {
++                'message_id': message_id,

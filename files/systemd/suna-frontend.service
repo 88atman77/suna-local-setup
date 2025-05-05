@@ -1,0 +1,20 @@
+[Unit]
+Description=Suna Frontend
+After=network.target suna-backend.service
+Requires=suna-backend.service
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/suna/frontend
+Environment="NEXT_PUBLIC_SUPABASE_URL=https://dummy.supabase.co"
+Environment="NEXT_PUBLIC_SUPABASE_ANON_KEY=dummy-key"
+Environment="NEXT_PUBLIC_API_URL=http://localhost:8080"
+Environment="ENV_MODE=LOCAL"
+ExecStart=/usr/bin/npm start
+Restart=on-failure
+StandardOutput=append:/var/log/suna/frontend.log
+StandardError=append:/var/log/suna/frontend.log
+
+[Install]
+WantedBy=multi-user.target

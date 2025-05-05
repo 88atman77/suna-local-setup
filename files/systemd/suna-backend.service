@@ -1,0 +1,22 @@
+[Unit]
+Description=Suna Backend
+After=network.target suna-llama.service redis-server.service
+Requires=suna-llama.service redis-server.service
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/suna/backend
+Environment="ENV_MODE=LOCAL"
+Environment="OPENAI_API_KEY=sk-dummy-key"
+Environment="OPENAI_API_BASE=http://localhost:8000/v1"
+Environment="SUPABASE_URL=https://dummy.supabase.co"
+Environment="SUPABASE_KEY=dummy-key"
+Environment="REDIS_URL=redis://localhost:6379"
+ExecStart=/opt/suna/venv/bin/python api.py
+Restart=on-failure
+StandardOutput=append:/var/log/suna/backend.log
+StandardError=append:/var/log/suna/backend.log
+
+[Install]
+WantedBy=multi-user.target

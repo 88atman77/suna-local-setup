@@ -1,0 +1,21 @@
+--- AuthProvider.tsx.orig
++++ AuthProvider.tsx
+@@ -20,6 +20,16 @@
+   useEffect(() => {
+     const getSession = async () => {
+       const { session, error } = await supabase.auth.getSession();
++      
++      // In LOCAL mode, create a mock session
++      if (process.env.ENV_MODE === "LOCAL" && !session?.user) {
++        console.log("LOCAL mode: Creating mock user session");
++        setSession({
++          user: { id: "local-user-123", email: "local@example.com" },
++          access_token: "mock-token",
++          refresh_token: "mock-refresh-token"
++        });
++        setLoading(false);
++        return;
++      }
+       
+       setSession(session);
+       setLoading(false);

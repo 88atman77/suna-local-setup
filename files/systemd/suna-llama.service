@@ -1,0 +1,15 @@
+[Unit]
+Description=llama.cpp server for Suna
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/suna
+ExecStart=/opt/suna/venv/bin/python -m llama_cpp.server --model /etc/suna/models/mistral-7b-instruct-v0.2.Q4_K_M.gguf --host 0.0.0.0 --port 8000 --n_ctx 4096
+Restart=on-failure
+StandardOutput=append:/var/log/suna/llama.log
+StandardError=append:/var/log/suna/llama.log
+
+[Install]
+WantedBy=multi-user.target

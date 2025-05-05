@@ -1,0 +1,14 @@
+--- supabase.py.orig
++++ supabase.py
+@@ -20,6 +20,10 @@
+     @property
+     async def client(self):
+         """Get the Supabase client."""
++        # In LOCAL mode, bypass database initialization
++        if config.ENV_MODE == EnvMode.LOCAL:
++            logger.warning("Running in LOCAL mode without Supabase client")
++            return None
++            
+         if self._client is None:
+             await self.init_client()
+         return self._client
